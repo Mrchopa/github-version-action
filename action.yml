@@ -1,0 +1,16 @@
+name: 'Get-version'
+description: 'This is a custom action written in JavaScript'
+author: 'Mr.Chopa <ys3gods@gmail.com>'
+inputs:
+  exampleInput:
+    description: 'An example input'
+    required: true
+    default: 'default value'
+outputs:
+  new-version:
+    description: 'new version'
+  branch-name:
+    description: 'current branch name'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
