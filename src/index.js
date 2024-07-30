@@ -15,7 +15,7 @@ async function run() {
       newVersion = 'from-tag'
     }
 
-    core.setOutput('branch-name', branchName);
+    core.setOutput('branch-name', ref);
     core.setOutput('new-version', newVersion);
     core.setOutput('example-input', exampleInput);
 
