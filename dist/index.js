@@ -34474,21 +34474,25 @@ async function run() {
     const context = github.context;
     const ref = context.ref; // This will be in the format "refs/heads/branch-name"
     const branchName = ref.replace('refs/heads/', '');
-    const exampleInput = core.getInput('exampleInput')
-
-    console.log(`Branch Name: ${branchName}`);
-    core.setOutput('branch-name', branchName);
+    const exampleInput = core.getInput('exampleInput');
+    var newVersion = 'default';
 
     if (/^feature\/.+$/.test(branchName) || /^dev.+$/.test(branchName)) {
-      core.setOutput('new-version', 'latest');
+      newVersion = 'latest'
     } else {
-      core.setOutput('new-version', '');
+      newVersion = 'from-tag'
     }
 
+    core.setOutput('branch-name', ref);
+    core.setOutput('new-version', newVersion);
     core.setOutput('example-input', exampleInput);
 
+    console.log(`New Version: ${newVersion}`);
+    console.log(`Branch Name: ${branchName}`);
+    console.log(`Example Input: ${exampleInput}`);
+
   } catch (error) {
-    core.setFailed(error.message);
+    core.setFailed(error);
   }
 }
 
