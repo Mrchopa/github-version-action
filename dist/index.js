@@ -34548,50 +34548,50 @@ function update_version(previous_version, release_type, is_pre_release) {
   const input_version_prefix = core.getInput('version-prefix');
   const input_pre_release_tag = core.getInput('pre-release-tag');
 
-  const version = previous_version.replace(input_pre_release_tag).replace(input_version_prefix).split('.');
+  const version = previous_version.replace(input_pre_release_tag, '').replace(input_version_prefix, '').split('.');
 
   console.log(`previous version text - [${previous_version}]`);
   console.log(`plain previous version text - [${version}]`);
 
   let updated_version = null;
 
-  if (release_type === 'major') {
-    updated_version = input_version_prefix + (Number(version[0]) + 1) + '.' + version[1] + '.' + version[2];
-  }
-  else if (release_type === 'minor') {
-    updated_version = input_version_prefix + version[0] + '.' + (Number(version[1]) + 1) + '.' + version[2];
-  }
-  else if (release_type === 'hotfix') {
-    updated_version = input_version_prefix + version[0] + '.' + version[1] + '.' + (Number(version[2]) + 1);
-  }
-  else if (release_type === 'revision') {
-    // 이전 버전이 snapshot 이었던 경우
-    if (previous_version.includes(input_pre_release_tag)) {
-      updated_version = input_version_prefix + version[0] + '.' + version[1] + '.' + version[2];
-    }
-    // 이전 버전이 정규 버전 이었던 경우
-    else {
-      updated_version = input_version_prefix + version[0] + '.' + (Number(version[1]) + 1) + '.' + version[2];
-    }
+  if (is_pre_release && previous_version.includes(input_pre_release_tag)) {
+    updated_version = input_version_prefix + version[0] + '.' + version[1] + '.' + version[2] + '-'+input_pre_release_tag;
 
+    if (version.length === 3) {
+      updated_version += '.0';
+    }
+    else if (version.length === 4) {
+      updated_version += '.' + (Number(version[3]) + 1);
+    }
+    else {
+      throw Error(`Invalid revision type version - [${previous_version}]`);
+    }
   }
   else {
-    throw Error(`Invalid release type - [${release_type}]`);
-  }
-
-  if (is_pre_release) {
-    updated_version += '-'+input_pre_release_tag;
-
-    if (release_type === 'revision') {
-      if (version.length === 3) {
-        updated_version += '.0';
+    if (release_type === 'major') {
+      updated_version = input_version_prefix + (Number(version[0]) + 1) + '.' + version[1] + '.' + version[2];
+    } else if (release_type === 'minor') {
+      updated_version = input_version_prefix + version[0] + '.' + (Number(version[1]) + 1) + '.' + version[2];
+    } else if (release_type === 'hotfix') {
+      updated_version = input_version_prefix + version[0] + '.' + version[1] + '.' + (Number(version[2]) + 1);
+    } else if (release_type === 'revision') {
+      // 이전 버전이 snapshot 이었던 경우
+      if (previous_version.includes(input_pre_release_tag)) {
+        updated_version = input_version_prefix + version[0] + '.' + version[1] + '.' + version[2];
       }
-      else if (version.length === 4) {
-        updated_version += '.' + (Number(version[3]) + 1);
-      }
+      // 이전 버전이 정규 버전 이었던 경우
       else {
-        throw Error(`Invalid revision type version - [${previous_version}]`);
+        updated_version = input_version_prefix + version[0] + '.' + (Number(version[1]) + 1) + '.' + version[2];
       }
+    } else if (release_type === 'pass') {
+      updated_version = input_version_prefix + version[0] + '.' + version[1] + '.' + version[2];
+    } else {
+      throw Error(`Invalid release type - [${release_type}]`);
+    }
+
+    if (is_pre_release) {
+      updated_version += '-' + input_pre_release_tag + '.0';
     }
   }
 
