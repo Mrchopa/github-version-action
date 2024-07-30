@@ -11,6 +11,8 @@ outputs:
     description: 'new version'
   branch-name:
     description: 'current branch name'
+  example-input:
+    description: 'input value'
 runs:
   using: 'node12'
   main: 'dist/index.js'
