@@ -19,12 +19,12 @@ async function run() {
     core.setOutput('new-version', newVersion);
     core.setOutput('example-input', exampleInput);
 
-    console.log(`Branch Name: ${branchName}`);
     console.log(`New Version: ${newVersion}`);
+    console.log(`Branch Name: ${branchName}`);
     console.log(`Example Input: ${exampleInput}`);
 
   } catch (error) {
-    core.setFailed(error.message);
+    core.setFailed(error);
   }
 }
 
