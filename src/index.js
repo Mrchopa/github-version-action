@@ -33,29 +33,19 @@ function check_pre_release(pre_release_branches, current_branch) {
   })
 }
 
-function get_last_version(tags, is_pre_release, snapshot_tag) {
+function get_last_version(tags, release_type, is_pre_release, snapshot_tag) {
   const tagNames = tags.data.map(tag => tag.name);
 
   if (!tagNames || tagNames.length === 0) return null
-
-  if (!is_pre_release) {
-    const snapshotTag = tagNames.filter(tagName => tagName.includes(snapshot_tag));
-
-    if (snapshotTag && snapshotTag.length > 0) {
-      return snapshotTag[0];
-    }
-  }
-
-  const nonSnapshotTag = tagNames.filter(tagName => !tagName.includes(snapshot_tag));
-
-  if (nonSnapshotTag && nonSnapshotTag.length > 0) {
-    return nonSnapshotTag[0];
-  }
 
   return tagNames[0];
 }
 
 function get_release_type(context, is_pre_release) {
+  if (!is_pre_release) {
+    return 'pass';
+  }
+
   const input_default_bump = core.getInput('default-bump');
   const input_major_prefix = core.getInput('major-prefix');
   const input_minor_prefix = core.getInput('minor-prefix');
@@ -79,17 +69,14 @@ function get_release_type(context, is_pre_release) {
   if (isMinor) return 'minor';
   if (isHotfix) return 'hotfix';
 
-  // 커밋 메세지에 버전엡 prefix가 없고 pre-release 인 경우 revision 업데이트
-  if (is_pre_release) {
-    return 'revision';
-  }
-
   console.log(`Unable to determine release type, using default bump - [${input_default_bump}]`)
 
   return input_default_bump;
 }
 
 function update_version(previous_version, release_type, is_pre_release) {
+  if (!previous_version) previous_version = "0.0.0";
+
   const input_version_prefix = core.getInput('version-prefix');
   const input_pre_release_tag = core.getInput('pre-release-tag');
 
@@ -143,18 +130,6 @@ function update_version(previous_version, release_type, is_pre_release) {
   return updated_version;
 }
 
-function generate_new_version_with_base(base_version, release_type, is_pre_release) {
-  return update_version(base_version, release_type, is_pre_release);
-}
-
-function generate_new_version_with_tag(previous_version, release_type, is_pre_release) {
-  if (!previous_version) {
-    return update_version('0.0.0', release_type, is_pre_release);
-  }
-
-  return update_version(previous_version, release_type, is_pre_release);
-}
-
 async function run() {
   try {
     const input_github_token = core.getInput('github-token');
@@ -181,26 +156,23 @@ async function run() {
     console.log(`is pre-release : [${is_pre_release}]`);
     console.log(`release type : [${release_type}]`);
 
-    let new_version = null;
     let previous_version = null;
 
     if (input_base_version) {
       previous_version = input_base_version;
-      new_version = generate_new_version_with_base(input_base_version, release_type, is_pre_release);
     }
     else {
       const octokit = github.getOctokit(input_github_token);
 
       const tags = await get_tag(octokit, context, input_fetch_tag_count);
-      const last_version = get_last_version(tags, is_pre_release, input_pre_release_tag);
+      const last_version = get_last_version(tags, release_type, is_pre_release, input_pre_release_tag);
 
       console.log(`last version : [${last_version}]`);
 
       previous_version = last_version;
-      new_version = generate_new_version_with_tag(last_version, release_type, is_pre_release);
     }
 
-    let output_new_version = new_version;
+    let output_new_version = update_version(previous_version, release_type, is_pre_release);
     let output_previous_version = previous_version;
     let output_release_type = release_type;
     let output_commit_message = context.payload.head_commit.message;
