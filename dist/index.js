@@ -34502,7 +34502,7 @@ async function run() {
     console.log(`Example Input: ${exampleInput}`);
 
     console.log(`commitSha: ${commitSha}`);
-    console.log(`payload: ${payload}`);
+    console.log(`payload: ${JSON.stringify(payload, null, 2)}`);
     console.log(`workflow: ${workflow}`);
     console.log(`eventName: ${eventName}`);
     console.log(`job: ${job}`);
