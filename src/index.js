@@ -39,14 +39,14 @@ function get_last_version(tags, is_pre_release, snapshot_tag) {
   if (!tagNames || tagNames.length === 0) return null
 
   if (!is_pre_release) {
-    const snapshotTag = tagNames.filter(tagName => tagName.endsWith(snapshot_tag));
+    const snapshotTag = tagNames.filter(tagName => tagName.includes(snapshot_tag));
 
     if (snapshotTag && snapshotTag.length > 0) {
       return snapshotTag[0];
     }
   }
 
-  const nonSnapshotTag = tagNames.filter(tagName => !tagName.endsWith(snapshot_tag));
+  const nonSnapshotTag = tagNames.filter(tagName => !tagName.includes(snapshot_tag));
 
   if (nonSnapshotTag && nonSnapshotTag.length > 0) {
     return nonSnapshotTag[0];
@@ -125,7 +125,7 @@ function update_version(previous_version, release_type, is_pre_release) {
   }
 
   if (is_pre_release) {
-    updated_version += input_pre_release_tag;
+    updated_version += '-'+input_pre_release_tag;
 
     if (release_type === 'revision') {
       if (version.length === 3) {
