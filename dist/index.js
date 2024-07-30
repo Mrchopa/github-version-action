@@ -34485,7 +34485,7 @@ async function run() {
       core.setOutput('new-version', '');
     }
 
-    core.setOutput('exampleInput', exampleInput);
+    core.setOutput('example-input', exampleInput);
 
   } catch (error) {
     core.setFailed(error.message);
