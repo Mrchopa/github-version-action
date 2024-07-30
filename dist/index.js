@@ -34578,7 +34578,15 @@ function update_version(previous_version, release_type, is_pre_release) {
     updated_version = input_version_prefix + version[0] + '.' + version[1] + '.' + (Number(version[2]) + 1);
   }
   else if (release_type === 'revision') {
-    updated_version = input_version_prefix + version[0] + '.' + version[1] + '.' + version[2];
+    // 이전 버전이 snapshot 이었던 경우
+    if (previous_version.contains(input_pre_release_tag)) {
+      updated_version = input_version_prefix + version[0] + '.' + version[1] + '.' + version[2];
+    }
+    // 이전 버전이 정규 버전 이었던 경우
+    else {
+      updated_version = input_version_prefix + version[0] + '.' + (Number(version[1]) + 1) + '.' + version[2];
+    }
+
   }
   else {
     throw Error(`Invalid release type - [${release_type}]`);
@@ -34607,7 +34615,7 @@ function generate_new_version_with_base(base_version, release_type, is_pre_relea
   return update_version(base_version, release_type, is_pre_release);
 }
 
-function generate_new_version_with_tag(previous_version, last_version, release_type, is_pre_release) {
+function generate_new_version_with_tag(previous_version, release_type, is_pre_release) {
   if (!previous_version) {
     return update_version('0.0.0', release_type, is_pre_release);
   }
@@ -34657,7 +34665,7 @@ async function run() {
       console.log(`last version : [${last_version}]`);
 
       previous_version = last_version;
-      new_version = generate_new_version_with_tag(input_base_version, last_version, release_type, is_pre_release, input_pre_release_tag);
+      new_version = generate_new_version_with_tag(last_version, release_type, is_pre_release);
     }
 
     let output_new_version = new_version;
