@@ -7,7 +7,7 @@ async function run() {
     const ref = context.ref; // This will be in the format "refs/heads/branch-name"
     const branchName = ref.replace('refs/heads/', '');
     const exampleInput = core.getInput('exampleInput')
-    let newVersion = ''
+    let newVersion = 'default'
 
     if (/^feature\/.+$/.test(branchName) || /^dev.+$/.test(branchName)) {
       newVersion = 'latest'
