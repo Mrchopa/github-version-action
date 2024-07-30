@@ -2,17 +2,66 @@ name: 'Get-version'
 description: 'This is a custom action written in JavaScript'
 author: 'Mr.Chopa <ys3gods@gmail.com>'
 inputs:
-  exampleInput:
-    description: 'An example input'
-    required: true
-    default: 'default value'
+  github-token:
+    description: '자동 TAG 생성 시 사용'
+    required: false
+  major-prefix:
+    description: 'Major 버전 증가를 위한 commit 메세지 prefix'
+    default: 'major: '
+    required: false
+  minor-prefix:
+    description: 'Minor 버전 증가를 위한 commit 메세지 prefix'
+    default: 'minor: '
+    required: false
+  hotfix-prefix:
+    description: 'Hotfix 버전 증가를 위한 commit 메세지 prefix'
+    default: 'hotfix: '
+    required: false
+  version-prefix:
+    description: '버전 생성 시 사용할 prefix'
+    default: 'v'
+    required: false
+  version-postfix:
+    description: '버전 생성 시 사용할 postfix'
+    default: ''
+    required: false
+  pre-release-branches:
+    description: '정식 릴리즈 이전의 임시 릴리즈용 버전을 생성할 브랜치 목록 (콤마(,)로 구분)'
+    default: 'release'
+    required: false
+  pre-release-tag:
+    description: '임시 릴리즈 버전에 붙일 postfix'
+    default: 'SNAPSHOT'
+    required: false
+  base-version:
+    description: '버전 생성 시 tag를 참조하지 않고 base_version을 기반으로 생성'
+    default: ''
+    required: false
+  fetch-tag-count:
+    description: '조회할 태그 개수'
+    default: "100"
+    required: false
+  create-tag:
+    description: '태그 생성 여부'
+    default: "true"
+    required: false
+  dry-run:
+    description: 'tag 생성을 하지 않고 버전만 계산'
+    default: 'false'
+    required: false
 outputs:
   new-version:
     description: 'new version'
+  previous-version:
+    description: 'previous-version'
+  release-type:
+    description: 'computed release type (`major`, `minor`, `hotfix`)'
+  commit-message:
+    description: 'commit message for computed release type'
+  commit-sha:
+    description: 'commit sha for computed release type'
   branch-name:
     description: 'current branch name'
-  example-input:
-    description: 'input value'
 runs:
   using: 'node12'
   main: 'dist/index.js'
