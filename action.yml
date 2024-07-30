@@ -5,6 +5,10 @@ inputs:
   github-token:
     description: '자동 TAG 생성 시 사용'
     required: false
+  default-bump:
+    description: '버전 증가를 위한 commit 메세지가 계산 되지 않을 때 증가할 버전'
+    default: 'minor'
+    required: false
   major-prefix:
     description: 'Major 버전 증가를 위한 commit 메세지 prefix'
     default: 'major: '
