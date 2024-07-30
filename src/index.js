@@ -80,7 +80,7 @@ function update_version(previous_version, release_type, is_pre_release) {
   const input_version_prefix = core.getInput('version-prefix');
   const input_pre_release_tag = core.getInput('pre-release-tag');
 
-  const version = previous_version.replace(input_pre_release_tag, '').replace(input_version_prefix, '').split('.');
+  const version = previous_version.replace('-'+input_pre_release_tag, '').replace(input_version_prefix, '').split('.');
 
   console.log(`previous version text - [${previous_version}]`);
   console.log(`plain previous version text - [${version}]`);
