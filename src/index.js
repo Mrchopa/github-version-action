@@ -106,9 +106,9 @@ function update_version(previous_version, release_type, is_pre_release) {
       else {
         throw Error(`Invalid revision type version - [${previous_version}]`);
       }
-    }
 
-    return updated_version;
+      return updated_version;
+    }
   }
 
   if (release_type === 'major') {
