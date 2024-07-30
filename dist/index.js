@@ -34598,11 +34598,36 @@ function update_version(previous_version, release_type, is_pre_release) {
   return updated_version;
 }
 
+async function create_tag(octokit, context, version, dry_run) {
+  if (dry_run) {
+    return null;
+  }
+
+  const response = await octokit.git.createTag({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    tag: version,
+    message: '',
+    object: context.sha,
+    type: 'commit'
+  });
+
+  const tag_sha = response.data.sha;
+
+  await octokit.git.createRef({
+    owner: context.repo.owner,
+    repo: context.repo.repo,
+    ref: `refs/tags/${version}`,
+    sha: tag_sha
+  });
+
+  return tag_sha;
+}
+
 async function run() {
   try {
     const input_github_token = core.getInput('github-token');
     const input_version_prefix = core.getInput('version-prefix');
-    const input_version_postfix = core.getInput('version-postfix');
     const input_pre_release_branches = core.getInput('pre-release-branches');
     const input_pre_release_tag = core.getInput('pre-release-tag');
     const input_base_version = core.getInput('base-version');
@@ -34625,12 +34650,13 @@ async function run() {
     console.log(`release type : [${release_type}]`);
 
     let previous_version = null;
+    const octokit = github.getOctokit(input_github_token);
 
     if (input_base_version) {
       previous_version = input_base_version;
     }
     else {
-      const octokit = github.getOctokit(input_github_token);
+
 
       const tags = await get_tag(octokit, context, input_fetch_tag_count);
       const last_version = get_last_version(tags, release_type, is_pre_release, input_pre_release_tag);
@@ -34640,12 +34666,16 @@ async function run() {
       previous_version = last_version;
     }
 
-    let output_new_version = update_version(previous_version, release_type, is_pre_release);
+    const new_version = update_version(previous_version, release_type, is_pre_release);
+    const tag_sha = await create_tag(octokit, context, new_version, input_dry_run);
+
+    let output_new_version = new_version
     let output_previous_version = previous_version;
     let output_release_type = release_type;
     let output_commit_message = context.payload.head_commit.message;
     let output_commit_sha = context.sha
     let output_branch_name = branchName;
+    let output_tag_sha = tag_sha;
 
     core.setOutput('new-version', output_new_version);
     core.setOutput('previous-version', output_previous_version);
@@ -34653,6 +34683,7 @@ async function run() {
     core.setOutput('commit-message', output_commit_message);
     core.setOutput('commit-sha', output_commit_sha);
     core.setOutput('branch-name', output_branch_name);
+    core.setOutput('tag-sha', output_tag_sha);
 
   } catch (error) {
     core.setFailed(error);

@@ -25,10 +25,6 @@ inputs:
     description: '버전 생성 시 사용할 prefix'
     default: 'v'
     required: false
-  version-postfix:
-    description: '버전 생성 시 사용할 postfix'
-    default: ''
-    required: false
   pre-release-branches:
     description: '정식 릴리즈 이전의 임시 릴리즈용 버전을 생성할 브랜치 목록 (콤마(,)로 구분)'
     default: 'release'
@@ -66,6 +62,8 @@ outputs:
     description: 'commit sha for computed release type'
   branch-name:
     description: 'current branch name'
+  tag-sha:
+    description: 'tag sha'
 runs:
   using: 'node12'
   main: 'dist/index.js'
