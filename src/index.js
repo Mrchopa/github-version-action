@@ -111,7 +111,7 @@ function update_version(previous_version, release_type, is_pre_release) {
   }
   else if (release_type === 'revision') {
     // 이전 버전이 snapshot 이었던 경우
-    if (previous_version.contains(input_pre_release_tag)) {
+    if (previous_version.includes(input_pre_release_tag)) {
       updated_version = input_version_prefix + version[0] + '.' + version[1] + '.' + version[2];
     }
     // 이전 버전이 정규 버전 이었던 경우
