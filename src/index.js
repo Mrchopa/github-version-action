@@ -6,6 +6,7 @@ async function run() {
     const context = github.context;
     const ref = context.ref; // This will be in the format "refs/heads/branch-name"
     const branchName = ref.replace('refs/heads/', '');
+    const exampleInput = core.getInput('exampleInput')
 
     console.log(`Branch Name: ${branchName}`);
     core.setOutput('branch-name', branchName);
@@ -15,6 +16,9 @@ async function run() {
     } else {
       core.setOutput('new-version', '');
     }
+
+    core.setOutput('exampleInput', exampleInput);
+
   } catch (error) {
     core.setFailed(error.message);
   }
