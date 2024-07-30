@@ -34580,20 +34580,11 @@ function update_version(previous_version, release_type, is_pre_release) {
   }
 
   if (release_type === 'major') {
-    updated_version = input_version_prefix + (Number(version[0]) + 1) + '.' + version[1] + '.' + version[2];
+    updated_version = input_version_prefix + (Number(version[0]) + 1) + '.0.0';
   } else if (release_type === 'minor') {
-    updated_version = input_version_prefix + version[0] + '.' + (Number(version[1]) + 1) + '.' + version[2];
+    updated_version = input_version_prefix + version[0] + '.' + (Number(version[1]) + 1) + '.0';
   } else if (release_type === 'hotfix') {
     updated_version = input_version_prefix + version[0] + '.' + version[1] + '.' + (Number(version[2]) + 1);
-  } else if (release_type === 'revision') {
-    // 이전 버전이 snapshot 이었던 경우
-    if (previous_version.includes(input_pre_release_tag)) {
-      updated_version = input_version_prefix + version[0] + '.' + version[1] + '.' + version[2];
-    }
-    // 이전 버전이 정규 버전 이었던 경우
-    else {
-      updated_version = input_version_prefix + version[0] + '.' + (Number(version[1]) + 1) + '.' + version[2];
-    }
   } else if (release_type === 'pass') {
     updated_version = input_version_prefix + version[0] + '.' + version[1] + '.' + version[2];
   } else {
