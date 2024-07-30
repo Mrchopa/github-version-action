@@ -108,17 +108,12 @@ async function run() {
       newVersion = 'from-tag'
     }
 
-    core.setOutput('branch-name', branchName);
-    core.setOutput('new-version', newVersion);
-    core.setOutput('example-input', exampleInput);
-
-    console.log(`New Version: ${newVersion}`);
-    console.log(`Branch Name: ${branchName}`);
-    console.log(`Example Input: ${exampleInput}`);
-
-    console.log(`commitSha: ${commitSha}`);
-    console.log(`payload: ${JSON.stringify(payload, null, 2)}`);
-    console.log(`message: ${payload.head_commit.message}`)
+    core.setOutput('new-version', output_new_version);
+    core.setOutput('previous-version', output_previous_version);
+    core.setOutput('release-type', output_release_type);
+    core.setOutput('commit-message', output_commit_message);
+    core.setOutput('commit-sha', output_commit_sha);
+    core.setOutput('branch-name', output_branch_name);
 
   } catch (error) {
     core.setFailed(error);
