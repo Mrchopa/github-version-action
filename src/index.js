@@ -35,6 +35,7 @@ async function run() {
 
     console.log(`commitSha: ${commitSha}`);
     console.log(`payload: ${JSON.stringify(payload, null, 2)}`);
+    console.log(`message: ${payload.head_commit.message}`)
     console.log(`workflow: ${workflow}`);
     console.log(`eventName: ${eventName}`);
     console.log(`job: ${job}`);
