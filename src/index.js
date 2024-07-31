@@ -226,7 +226,7 @@ async function run() {
     console.log(`last version : [${last_version}]`);
 
     if (base_version) {
-      new_version = update_base_version(last_version, release_type, is_pre_release);
+      new_version = update_base_version(base_version, release_type, is_pre_release);
     }
     else {
       new_version = update_version(last_version, release_type, is_pre_release);
