@@ -130,6 +130,26 @@ function update_version(previous_version, release_type, is_pre_release) {
   return updated_version;
 }
 
+function update_base_version(base_version, release_type, is_pre_release) {
+  const input_version_prefix = core.getInput('version-prefix');
+  const input_pre_release_tag = core.getInput('pre-release-tag');
+
+  const version = base_version.replace('-'+input_pre_release_tag, '').replace(input_version_prefix, '').split('.');
+
+  console.log(`base version text - [${base_version}]`);
+  console.log(`plain base version text - [${version}]`);
+
+  let updated_version = null;
+
+  updated_version = input_version_prefix + version[0] + '.' + version[1] + '.' + version[2];
+
+  if (is_pre_release) {
+    updated_version += '-' + input_pre_release_tag + '.0';
+  }
+
+  return updated_version;
+}
+
 async function create_tag(octokit, context, version, dry_run) {
   if (dry_run) {
     return null;
@@ -156,6 +176,19 @@ async function create_tag(octokit, context, version, dry_run) {
   return tag_sha;
 }
 
+function get_base_version(context, release_type) {
+  const regex = `${release_type}:\s*\[([^\\]]+)\\]/`;
+
+  const match = context.payload.head_commit.message.match(regex);
+
+  if (match && match[1]) {
+    console.log(`input hard fix version : [${match[1]}]`);
+    return match[1];
+  }
+
+  return null;
+}
+
 async function run() {
   try {
     const input_github_token = core.getInput('github-token');
@@ -177,32 +210,32 @@ async function run() {
 
     const is_pre_release = check_pre_release(input_pre_release_branches, branchName);
     const release_type = get_release_type(context, is_pre_release);
+    const base_version = get_base_version(context, release_type);
 
+    console.log(`base version : [${base_version}]`);
     console.log(`is pre-release : [${is_pre_release}]`);
     console.log(`release type : [${release_type}]`);
 
-    let previous_version = null;
+    let new_version = null;
+
     const octokit = github.getOctokit(input_github_token);
 
-    if (input_base_version) {
-      previous_version = input_base_version;
+    const tags = await get_tag(octokit, context, input_fetch_tag_count);
+    const last_version = get_last_version(tags, release_type, is_pre_release, input_pre_release_tag);
+
+    console.log(`last version : [${last_version}]`);
+
+    if (base_version) {
+      new_version = update_base_version(last_version, release_type, is_pre_release);
     }
     else {
-
-
-      const tags = await get_tag(octokit, context, input_fetch_tag_count);
-      const last_version = get_last_version(tags, release_type, is_pre_release, input_pre_release_tag);
-
-      console.log(`last version : [${last_version}]`);
-
-      previous_version = last_version;
+      new_version = update_version(last_version, release_type, is_pre_release);
     }
 
-    const new_version = update_version(previous_version, release_type, is_pre_release);
     const tag_sha = await create_tag(octokit, context, new_version, input_dry_run);
 
     let output_new_version = new_version
-    let output_previous_version = previous_version;
+    let output_previous_version = last_version;
     let output_release_type = release_type;
     let output_commit_message = context.payload.head_commit.message;
     let output_commit_sha = context.sha
