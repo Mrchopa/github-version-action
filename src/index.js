@@ -177,7 +177,7 @@ async function create_tag(octokit, context, version, dry_run) {
 }
 
 function get_base_version(context, release_type) {
-  const regex = `${release_type}:\s*\[([^\\]]+)\\]/`;
+  const regex = new RegExp(`${release_type}:\\s*\\[([^\\]]+)\\]`);
 
   const match = context.payload.head_commit.message.match(regex);
 
