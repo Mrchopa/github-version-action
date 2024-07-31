@@ -37,10 +37,6 @@ inputs:
     description: '조회할 태그 개수'
     default: "100"
     required: false
-  create-tag:
-    description: '태그 생성 여부'
-    default: "true"
-    required: false
   dry-run:
     description: 'tag 생성을 하지 않고 버전만 계산'
     default: 'false'

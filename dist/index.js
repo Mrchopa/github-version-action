@@ -34501,7 +34501,7 @@ function check_pre_release(pre_release_branches, current_branch) {
   })
 }
 
-function get_last_version(tags, release_type, is_pre_release, snapshot_tag) {
+function get_last_version(tags) {
   const tagNames = tags.data.map(tag => tag.name);
 
   if (!tagNames || tagNames.length === 0) return null
@@ -34539,7 +34539,7 @@ function get_release_type(context, is_pre_release) {
 
   console.log(`Unable to determine release type, using default bump - [${input_default_bump}]`)
 
-  return input_default_bump;
+  return 'default';
 }
 
 function update_version(previous_version, release_type, is_pre_release) {
@@ -34547,6 +34547,7 @@ function update_version(previous_version, release_type, is_pre_release) {
 
   const input_version_prefix = core.getInput('version-prefix');
   const input_pre_release_tag = core.getInput('pre-release-tag');
+  const input_default_bump = core.getInput('default-bump');
 
   const version = previous_version.replace('-'+input_pre_release_tag, '').replace(input_version_prefix, '').split('.');
 
@@ -34562,6 +34563,7 @@ function update_version(previous_version, release_type, is_pre_release) {
         (release_type === 'major' && version[1] === "0" && version[2] === "0")
         || (release_type === 'minor' && version[2] === "0")
         || (release_type === 'hotfix' && version[2] !== "0")
+        || release_type === 'default'
     ) {
       updated_version = input_version_prefix + version[0] + '.' + version[1] + '.' + version[2] + '-'+input_pre_release_tag;
 
@@ -34577,6 +34579,8 @@ function update_version(previous_version, release_type, is_pre_release) {
 
       return updated_version;
     }
+
+    release_type = input_default_bump
   }
 
   if (release_type === 'major') {
@@ -34660,12 +34664,9 @@ function get_base_version(context, release_type) {
 async function run() {
   try {
     const input_github_token = core.getInput('github-token');
-    const input_version_prefix = core.getInput('version-prefix');
     const input_pre_release_branches = core.getInput('pre-release-branches');
     const input_pre_release_tag = core.getInput('pre-release-tag');
-    const input_base_version = core.getInput('base-version');
     const input_fetch_tag_count = Number(core.getInput('fetch-tag-count'));
-    const input_create_tag = core.getBooleanInput("create-tag")
     const input_dry_run = core.getBooleanInput('dry-run');
 
     const context = github.context;
@@ -34689,7 +34690,7 @@ async function run() {
     const octokit = github.getOctokit(input_github_token);
 
     const tags = await get_tag(octokit, context, input_fetch_tag_count);
-    const last_version = get_last_version(tags, release_type, is_pre_release, input_pre_release_tag);
+    const last_version = get_last_version(tags);
 
     console.log(`last version : [${last_version}]`);
 
