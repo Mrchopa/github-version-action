@@ -111,9 +111,11 @@ function update_version(previous_version, release_type, is_pre_release) {
 
       return updated_version;
     }
-
-    release_type = input_default_bump
   }
+
+  if (release_type === 'default') {
+      release_type = input_default_bump
+    }
 
   if (release_type === 'major') {
     updated_version = input_version_prefix + (Number(version[0]) + 1) + '.0.0';
